@@ -1,0 +1,17 @@
+stages:
+    - Build
+
+image: docker:latest
+
+variables:
+    DOCKER_DRIVER: overlay
+
+services:
+    - docker:dind
+
+Build image:
+    stage: Build
+    script:
+        - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+        - docker build -t registry.gitlab.com/gottschalg/wordpress-container .
+        - docker push registry.gitlab.com/gottschalg/wordpress-container
