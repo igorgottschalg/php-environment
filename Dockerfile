@@ -5,8 +5,7 @@ RUN apt update
 RUN apt list --upgradable
 RUN apt update
 
-RUN apt install -q -y nano curl git wget iputils-ping zlibc zlib1g zlib1g-dev zip unzip build-essential libpcre3 libpcre3-dev openssl uuid-dev libssl-dev libperl-dev
-
+RUN apt install -q -y nano curl git wget iputils-ping zlibc zlib1g zlib1g-dev zip unzip build-essential libpcre3 libpcre3-dev openssl uuid-dev libssl-dev libperl-dev procps mc cron supervisor
 ARG MAKE_J=4
 ARG NGINX_VERSION=1.14.0
 ARG PAGESPEED_VERSION=1.13.35.2
@@ -110,4 +109,4 @@ RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 EXPOSE 443 80
 
-CMD ["/usr/bin/supervisord -n -c /etc/supervisord.conf"]
+CMD ["/bin/autostart/autostart.sh"]
