@@ -1,62 +1,11 @@
-FROM php:7.2-fpm
+FROM ubuntu:bionic
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update
-RUN apt-get install -y \
-    libmcrypt-dev \
-    libicu-dev \
-    libpq-dev \
-    libbz2-dev \
-    procps \
-    mc \
-    nano \
-    wget \
-    cron \
-    supervisor \
-    libevent-dev \
-    librabbitmq-dev \
-    # nginx \
-    curl \
-    libxml2 \
-    libwebp-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    libxpm-dev \
-    libfreetype6-dev \
-    libxml2-dev
+RUN apt update
+RUN apt list --upgradable
+RUN apt update
 
-RUN  docker-php-ext-install bcmath \
-    && docker-php-ext-install bz2 \
-    && docker-php-ext-install fileinfo \
-    && docker-php-ext-install iconv \
-    && docker-php-ext-install json\
-    && docker-php-ext-install mbstring\
-    && docker-php-ext-install mysqli\
-    && docker-php-ext-install opcache
-
-# RUN docker-php-ext-install -j$(nproc) mcrypt \
-RUN  docker-php-ext-install -j$(nproc) pdo \
-    && docker-php-ext-install -j$(nproc) pdo_mysql \
-    && docker-php-ext-install -j$(nproc) session \
-    && docker-php-ext-install -j$(nproc) simplexml \
-    && docker-php-ext-install -j$(nproc) xml \
-    && docker-php-ext-install -j$(nproc) zip
-
-
-RUN docker-php-ext-configure gd --with-gd --with-webp-dir --with-jpeg-dir \
-    --with-png-dir --with-zlib-dir --with-xpm-dir --with-freetype-dir \
-    --enable-gd-native-ttf
-RUN docker-php-ext-install gd
-
-# =========>
-
-# Install APCu and APC backward compatibility
-RUN pecl install apcu \
-    && pecl install apcu_bc-1.0.3 \
-    && docker-php-ext-enable apcu --ini-name 10-docker-php-ext-apcu.ini \
-    && docker-php-ext-enable apc --ini-name 20-docker-php-ext-apc.ini
-
-RUN apt-get install build-essential libpcre3 libpcre3-dev openssl uuid-dev libssl-dev libperl-dev -y
-RUN apt-get install git -y
+RUN apt install -q -y nano curl git wget iputils-ping zlibc zlib1g zlib1g-dev zip unzip build-essential libpcre3 libpcre3-dev openssl uuid-dev libssl-dev libperl-dev
 
 ARG MAKE_J=4
 ARG NGINX_VERSION=1.14.0
@@ -68,9 +17,7 @@ ENV MAKE_J=${MAKE_J} \
     LIBPNG_VERSION=${LIBPNG_VERSION} \
     PAGESPEED_VERSION=${PAGESPEED_VERSION}
 
-RUN cd /tmp && \
-    curl -O -L https://github.com/pagespeed/ngx_pagespeed/archive/v${PAGESPEED_VERSION}-stable.zip && \
-    unzip v${PAGESPEED_VERSION}-stable.zip
+RUN cd /tmp && curl -O -L https://github.com/pagespeed/ngx_pagespeed/archive/v${PAGESPEED_VERSION}-stable.zip && unzip v${PAGESPEED_VERSION}-stable.zip
 
 RUN cd /tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable/ && \
     psol_url=https://dl.google.com/dl/page-speed/psol/${PAGESPEED_VERSION}.tar.gz && \
@@ -126,14 +73,14 @@ RUN cd /tmp && \
     make install --silent
 
 RUN apt-get install -q -y ssmtp mailutils
+RUN apt install php-fpm php-mysql -y
+RUN apt install -q -y php7.2-cur php7.2-g php7.2-xm php7.2-mbstrin php7.2-soap php7.2-xml php7.2-json
 
 RUN rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p /var/cache/ngx_pagespeed && \
     chmod -R o+wr /var/cache/ngx_pagespeed
-
-RUN chmod +x /usr/local/bin/*
 
 RUN mkdir -p /etc/nginx && \
     mkdir -p /var/www/app && \
@@ -156,6 +103,10 @@ ADD ./autostart.sh /bin/autostart/autostart.sh
 ADD ./supervisord.conf /etc/supervisord.conf
 
 RUN chmod +x /bin/autostart/autostart.sh
+
+ADD ./nginx.conf /etc/nginx/nginx.conf
+ADD ./php.ini /etc/php/7.2/fpm/php.ini
+RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 EXPOSE 443 80
 
