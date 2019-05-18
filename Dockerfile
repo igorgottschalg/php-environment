@@ -110,4 +110,4 @@ RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 EXPOSE 443 80
 
-CMD ["/bin/autostart/autostart.sh"]
+CMD ["/usr/bin/supervisord -n -c /etc/supervisord.conf"]
