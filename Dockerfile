@@ -125,6 +125,8 @@ RUN cd /tmp && \
     --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
     make install --silent
 
+RUN apt-get install -q -y ssmtp mailutils
+
 RUN rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
