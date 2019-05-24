@@ -108,7 +108,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 RUN chmod +x /bin/autostart/autostart.sh
 
 ADD ./nginx.conf /etc/nginx/nginx.conf
-ADD ./php.ini /etc/php/7.2/fpm/php.ini
+ADD ./php.ini /etc/php/7.2/fpm/php-fpm.conf
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 RUN service php7.2-fpm start
