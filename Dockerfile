@@ -74,7 +74,7 @@ RUN cd /tmp && \
 RUN apt-get install -q -y ssmtp mailutils
 RUN apt-get install -q -y software-properties-common
 RUN apt install -y php-fpm
-RUN apt install -q -y php7.2-soap php7.2-json php-pear php7.2-dev php7.2-zip php7.2-curl php7.2-gd php7.2-mysql php7.2-mcrypt php7.2-xml libapache2-mod-php7.2
+RUN apt install -q -y php7.2-soap php7.2-json php-pear php7.2-dev php7.2-zip php7.2-curl php7.2-gd php7.2-mysql php7.2-xml libapache2-mod-php7.2
 RUN pecl install apcu
 RUN echo "extension=apcu.so" | tee -a /etc/php/7.2/mods-available/cache.ini
 RUN ln -s /etc/php/7.2/mods-available/cache.ini /etc/php/7.2/apache2/conf.d/30-cache.ini
