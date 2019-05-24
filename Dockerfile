@@ -11,6 +11,9 @@ ARG NGINX_VERSION=1.14.0
 ARG PAGESPEED_VERSION=1.13.35.2
 ARG LIBPNG_VERSION=1.6.29
 
+ENV php_conf /etc/php/7.2/fpm/php.ini
+ENV fpm_conf /etc/php/7.2/fpm/pool.d/www.conf
+
 ENV MAKE_J=${MAKE_J} \
     NGINX_VERSION=${NGINX_VERSION} \
     LIBPNG_VERSION=${LIBPNG_VERSION} \
@@ -79,6 +82,19 @@ RUN pecl install apcu
 RUN echo "extension=apcu.so" | tee -a /etc/php/7.2/mods-available/cache.ini
 RUN ln -s /etc/php/7.2/mods-available/cache.ini /etc/php/7.2/apache2/conf.d/30-cache.ini
 
+RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
+    && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
+    && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
+    && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${php_conf} \
+    && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
+    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php/7.2/fpm/php-fpm.conf \
+    && sed -i "s/;catch_workers_output\s*=\s*yes/catch_workers_output = yes/g" ${fpm_conf} \
+    && sed -i "s/pm.max_children = 5/pm.max_children = 4/g" ${fpm_conf} \
+    && sed -i "s/pm.start_servers = 2/pm.start_servers = 3/g" ${fpm_conf} \
+    && sed -i "s/pm.min_spare_servers = 1/pm.min_spare_servers = 2/g" ${fpm_conf} \
+    && sed -i "s/pm.max_spare_servers = 3/pm.max_spare_servers = 4/g" ${fpm_conf} \
+    && sed -i "s/pm.max_requests = 500/pm.max_requests = 200/g" ${fpm_conf}
+
 RUN rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && \
     ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
@@ -108,7 +124,6 @@ ADD ./supervisord.conf /etc/supervisord.conf
 RUN chmod +x /bin/autostart/autostart.sh
 
 ADD ./nginx.conf /etc/nginx/nginx.conf
-ADD ./php.ini /etc/php/7.2/fpm/php-fpm.conf
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 RUN service php7.2-fpm start
