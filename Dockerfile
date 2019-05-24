@@ -112,7 +112,6 @@ ADD ./php.ini /etc/php/7.2/fpm/php.ini
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 RUN service php7.2-fpm start
-RUN service nginx start
 
 EXPOSE 443 80
 
