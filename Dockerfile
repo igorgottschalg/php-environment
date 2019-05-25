@@ -82,11 +82,6 @@ RUN cd /tmp && \
     make install --silent
 
 RUN apt install -q -y software-properties-common
-RUN echo 'deb http://pkg.cloudflare.com/ xenial main' | tee /etc/apt/sources.list.d/cloudflare-main.list
-RUN curl -C - https://pkg.cloudflare.com/pubkey.gpg | apt-key add -
-RUN apt update
-RUN apt install -y railgun-stable
-
 RUN apt install -y php-fpm
 RUN apt install -q -y php7.2-soap php7.2-json php-pear php7.2-dev php7.2-zip php7.2-curl php7.2-gd php7.2-mysql php7.2-xml libapache2-mod-php7.2 php7.2-mbstring
 RUN pecl install apcu
@@ -104,10 +99,7 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/pm.start_servers = 2/pm.start_servers = 3/g" ${fpm_conf} \
     && sed -i "s/pm.min_spare_servers = 1/pm.min_spare_servers = 2/g" ${fpm_conf} \
     && sed -i "s/pm.max_spare_servers = 3/pm.max_spare_servers = 4/g" ${fpm_conf} \
-    && sed -i "s/pm.max_requests = 500/pm.max_requests = 200/g" ${fpm_conf} \
-    && /bin/autostart/railgun.sh > /etc/railgun/railgun.conf 2>&1 
-
-RUN /usr/bin/rg-listener -config=/etc/railgun/railgun.conf
+    && sed -i "s/pm.max_requests = 500/pm.max_requests = 200/g" ${fpm_conf}
 
 RUN apt autoremove -y && apt clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
