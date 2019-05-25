@@ -1,5 +1,12 @@
 FROM ubuntu:bionic
+
 ENV DEBIAN_FRONTEND noninteractive
+ENV RG_WAN_PORT 2408
+ENV RG_LOG_LEVEL 0
+ENV RG_ACT_TOKEN ""
+ENV RG_ACT_HOST ""
+ENV RG_MEMCACHED_SERVERS "memcached:11211"
+
 
 RUN apt update
 RUN apt list --upgradable
@@ -74,8 +81,12 @@ RUN cd /tmp && \
     --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
     make install --silent
 
-RUN apt-get install -q -y ssmtp mailutils
-RUN apt-get install -q -y software-properties-common
+RUN apt install -q -y software-properties-common
+RUN echo 'deb http://pkg.cloudflare.com/ xenial main' | tee /etc/apt/sources.list.d/cloudflare-main.list
+RUN curl -C - https://pkg.cloudflare.com/pubkey.gpg | apt-key add -
+RUN apt update
+RUN apt install -y railgun-stable
+
 RUN apt install -y php-fpm
 RUN apt install -q -y php7.2-soap php7.2-json php-pear php7.2-dev php7.2-zip php7.2-curl php7.2-gd php7.2-mysql php7.2-xml libapache2-mod-php7.2 php7.2-mbstring
 RUN pecl install apcu
@@ -95,8 +106,8 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/pm.max_spare_servers = 3/pm.max_spare_servers = 4/g" ${fpm_conf} \
     && sed -i "s/pm.max_requests = 500/pm.max_requests = 200/g" ${fpm_conf}
 
-RUN rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* && \
-    ln -sf /dev/stdout /var/log/nginx/access.log && \
+RUN apt autoremove -y && apt clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     mkdir -p /var/cache/ngx_pagespeed && \
     chmod -R o+wr /var/cache/ngx_pagespeed
@@ -107,21 +118,21 @@ RUN mkdir -p /etc/nginx && \
     mkdir -p /var/log/supervisor && \
     mkdir -p /etc/letsencrypt/webrootauth
 
-# nginx site conf
 RUN mkdir -p /etc/nginx/sites-available/ && \
     mkdir -p /etc/nginx/sites-enabled/ && \
     mkdir -p /etc/nginx/ssl/ && \
+    mkdir -p /usr/bin/ && \
     rm -Rf /var/www/* && \
     mkdir /var/www/html/
 
 RUN touch /var/log/cron.log
 
-# Add Scripts
 RUN mkdir -p /bin/autostart
 ADD ./autostart.sh /bin/autostart/autostart.sh
 ADD ./supervisord.conf /etc/supervisord.conf
+ADD ./railgun.sh /bin/autostart/railgun.sh;
 
-RUN chmod +x /bin/autostart/autostart.sh
+RUN chmod +x /bin/autostart/railgun.sh; chmod +x /bin/autostart/autostart.sh
 
 ADD ./nginx.conf /etc/nginx/nginx.conf
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
