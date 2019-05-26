@@ -132,9 +132,8 @@ RUN touch /var/log/cron.log
 RUN mkdir -p /bin/autostart
 ADD ./autostart.sh /bin/autostart/autostart.sh
 ADD ./supervisord.conf /etc/supervisord.conf
-ADD ./railgun.sh /bin/autostart/railgun.sh;
 
-RUN chmod +x /bin/autostart/railgun.sh; chmod +x /bin/autostart/autostart.sh
+RUN chmod +x /bin/autostart/autostart.sh
 
 ADD ./nginx.conf /etc/nginx/nginx.conf
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
