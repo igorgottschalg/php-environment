@@ -38,12 +38,14 @@ RUN cd /tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable/ && \
 RUN cd /tmp && \
     git clone git://github.com/vozlt/nginx-module-vts.git && \
     git clone https://github.com/openresty/headers-more-nginx-module.git && \
-    git clone git://github.com/yaoweibin/ngx_http_substitutions_filter_module.git
+    git clone git://github.com/yaoweibin/ngx_http_substitutions_filter_module.git && \
+    git clone --recursive https://github.com/google/ngx_brotli.git && \
+    git clone https://github.com/nbs-system/naxsi.git
 
 # Build Nginx with support for PageSpeed
-RUN cd /tmp && \
-    curl -L http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar -zx && \
-    cd /tmp/nginx-${NGINX_VERSION} && \
+RUN cd /tmp && curl -L http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar -zx
+
+RUN cd /tmp/nginx-${NGINX_VERSION} && \
     LD_LIBRARY_PATH=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}/usr/lib:/usr/lib ./configure \
     --sbin-path=/usr/sbin \
     --modules-path=/usr/lib/nginx \
@@ -59,9 +61,9 @@ RUN cd /tmp && \
     --with-threads \
     --with-stream \
     --with-stream_ssl_module \
+    --without-http_memcached_module \
     --without-http_autoindex_module \
     --without-http_browser_module \
-    --without-http_memcached_module \
     --without-http_userid_module \
     --without-mail_pop3_module \
     --without-mail_imap_module \
@@ -70,6 +72,7 @@ RUN cd /tmp && \
     --without-http_uwsgi_module \
     --without-http_scgi_module \
     --without-http_upstream_ip_hash_module \
+    --without-http_gzip_module \
     --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -78,8 +81,12 @@ RUN cd /tmp && \
     --add-module=/tmp/nginx-module-vts \
     --add-module=/tmp/headers-more-nginx-module \
     --add-module=/tmp/ngx_http_substitutions_filter_module \
-    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
+    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable \
+    --add-module=/tmp/naxsi/naxsi_src/ \
+    --add-module=/tmp/ngx_brotli/ && \
     make install --silent
+
+RUN  wget -O /etc/nginx/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_config/naxsi_core.rules
 
 RUN apt install -q -y software-properties-common
 RUN apt install -y php-fpm
