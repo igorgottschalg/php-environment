@@ -39,8 +39,7 @@ RUN cd /tmp && \
     git clone git://github.com/vozlt/nginx-module-vts.git && \
     git clone https://github.com/openresty/headers-more-nginx-module.git && \
     git clone git://github.com/yaoweibin/ngx_http_substitutions_filter_module.git && \
-    git clone --recursive https://github.com/google/ngx_brotli.git && \
-    git clone https://github.com/nbs-system/naxsi.git
+    git clone --recursive https://github.com/google/ngx_brotli.git
 
 # Build Nginx with support for PageSpeed
 RUN cd /tmp && curl -L http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz | tar -zx
@@ -82,11 +81,8 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --add-module=/tmp/headers-more-nginx-module \
     --add-module=/tmp/ngx_http_substitutions_filter_module \
     --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable \
-    --add-module=/tmp/naxsi/naxsi_src/ \
     --add-module=/tmp/ngx_brotli/ && \
     make install --silent
-
-RUN  wget -O /etc/nginx/naxsi_core.rules https://raw.githubusercontent.com/nbs-system/naxsi/master/naxsi_config/naxsi_core.rules
 
 RUN apt install -q -y software-properties-common
 RUN apt install -y php-fpm
