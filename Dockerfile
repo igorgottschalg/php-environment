@@ -80,8 +80,8 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --add-module=/tmp/nginx-module-vts \
     --add-module=/tmp/headers-more-nginx-module \
     --add-module=/tmp/ngx_http_substitutions_filter_module \
-    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable \
-    --add-module=/tmp/ngx_brotli/ && \
+    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
+    # --add-module=/tmp/ngx_brotli/ && \
     make install --silent
 
 RUN apt install -q -y software-properties-common
