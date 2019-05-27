@@ -60,7 +60,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --with-threads \
     --with-stream \
     --with-stream_ssl_module \
-    --without-http_memcached_module \
+    # --without-http_memcached_module \
     --without-http_autoindex_module \
     --without-http_browser_module \
     --without-http_userid_module \
@@ -71,7 +71,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --without-http_uwsgi_module \
     --without-http_scgi_module \
     --without-http_upstream_ip_hash_module \
-    --without-http_gzip_module \
+    # --without-http_gzip_module \
     --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
