@@ -60,7 +60,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --with-threads \
     --with-stream \
     --with-stream_ssl_module \
-    --without-http_memcached_module \
+    # --without-http_memcached_module \
     --without-http_autoindex_module \
     --without-http_browser_module \
     --without-http_userid_module \
@@ -71,7 +71,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --without-http_uwsgi_module \
     --without-http_scgi_module \
     --without-http_upstream_ip_hash_module \
-    --without-http_gzip_module \
+    # --without-http_gzip_module \
     --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -80,8 +80,8 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --add-module=/tmp/nginx-module-vts \
     --add-module=/tmp/headers-more-nginx-module \
     --add-module=/tmp/ngx_http_substitutions_filter_module \
-    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable \
-    --add-module=/tmp/ngx_brotli/ && \
+    --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
+    # --add-module=/tmp/ngx_brotli/ && \
     make install --silent
 
 RUN apt install -q -y software-properties-common
