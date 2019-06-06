@@ -13,5 +13,5 @@ Build image:
   stage: Build
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t registry.gitlab.com/gottschalg/wordpress-container:bionic .
-    - docker push registry.gitlab.com/gottschalg/wordpress-container:bionic
+    - docker build -t registry.gitlab.com/gottschalg/wordpress-container:5.2.1 .
+    - docker push registry.gitlab.com/gottschalg/wordpress-container:5.2.1
