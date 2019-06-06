@@ -7,7 +7,6 @@ ENV RG_ACT_TOKEN ""
 ENV RG_ACT_HOST ""
 ENV RG_MEMCACHED_SERVERS "memcached:11211"
 
-
 RUN apt update
 RUN apt list --upgradable
 RUN apt update
@@ -60,7 +59,6 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --with-threads \
     --with-stream \
     --with-stream_ssl_module \
-    # --without-http_memcached_module \
     --without-http_autoindex_module \
     --without-http_browser_module \
     --without-http_userid_module \
@@ -71,7 +69,6 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --without-http_uwsgi_module \
     --without-http_scgi_module \
     --without-http_upstream_ip_hash_module \
-    # --without-http_gzip_module \
     --prefix=/etc/nginx \
     --conf-path=/etc/nginx/nginx.conf \
     --http-log-path=/var/log/nginx/access.log \
@@ -81,10 +78,9 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --add-module=/tmp/headers-more-nginx-module \
     --add-module=/tmp/ngx_http_substitutions_filter_module \
     --add-module=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}-stable && \
-    # --add-module=/tmp/ngx_brotli/ && \
     make install --silent
 
-RUN apt install -q -y software-properties-common
+# RUN apt install -q -y software-properties-common
 RUN apt install -y php-fpm
 RUN apt install -q -y php7.2-soap php7.2-json php-pear php7.2-dev php7.2-zip php7.2-curl php7.2-gd php7.2-mysql php7.2-xml libapache2-mod-php7.2 php7.2-mbstring
 RUN pecl install apcu
@@ -135,6 +131,8 @@ ADD ./nginx.conf /etc/nginx/nginx.conf
 RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 
 RUN service php7.2-fpm start
+
+RUN curl -L  https://br.wordpress.org/wordpress-5.2.1-pt_BR.tar.gz | tar -xz -C /var/www/html
 
 EXPOSE 443 80
 
