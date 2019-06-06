@@ -133,6 +133,9 @@ RUN sed -i "s/user  nginx;/user  www-data;/g" /etc/nginx/nginx.conf
 RUN service php7.2-fpm start
 
 RUN curl -L  https://br.wordpress.org/wordpress-5.2.1-pt_BR.tar.gz | tar -xz -C /var/www/html
+RUN mv /var/www/html/wordpress/* /var/www/html/
+RUN rm -Rf /var/www/html/wordpress
+RUN chmod -R g+rw /var/www && chown -R www-data:www-data /var/www
 
 EXPOSE 443 80
 
