@@ -59,7 +59,6 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     --with-threads \
     --with-stream \
     --with-stream_ssl_module \
-    --without-http_autoindex_module \
     --without-http_browser_module \
     --without-http_userid_module \
     --without-mail_pop3_module \
