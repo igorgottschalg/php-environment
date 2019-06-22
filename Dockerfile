@@ -47,6 +47,7 @@ RUN cd /tmp/nginx-${NGINX_VERSION} && \
     LD_LIBRARY_PATH=/tmp/incubator-pagespeed-ngx-${PAGESPEED_VERSION}/usr/lib:/usr/lib ./configure \
     --sbin-path=/usr/sbin \
     --modules-path=/usr/lib/nginx \
+    --with-http_autoindex_module \
     --with-http_ssl_module \
     --with-http_gzip_static_module \
     --with-file-aio \
