@@ -62,6 +62,7 @@ RUN apt install -q -y \
     php7.2-gd \
     php7.2-mysql \
     php7.2-xml \
+    php7.2-memcached \
     libapache2-mod-php7.2 \
     php7.2-mbstring \
     graphicsmagick \
