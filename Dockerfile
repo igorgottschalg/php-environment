@@ -44,11 +44,21 @@ RUN apt install -y -q apache2 \
     apache2-utils \
     libexpat1 
 
-RUN a2enmod rewrite
-
 RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
 RUN dpkg -i mod-pagespeed-*.deb
 RUN apt -f install
+
+RUN apt install libapache2-mod-proxy-html libxml2-dev
+
+RUN a2enmod proxy
+RUN a2enmod proxy_http
+RUN a2enmod proxy_ajp
+RUN a2enmod rewrite
+RUN a2enmod deflate
+RUN a2enmod headers
+RUN a2enmod proxy_balancer
+RUN a2enmod proxy_connect
+RUN a2enmod proxy_html
 
 RUN apt install -q -y \
     php \
