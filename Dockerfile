@@ -41,11 +41,10 @@ ARG LIBPNG_VERSION=1.6.29
 ENV php_conf /etc/php/7.2/apache2/php.ini
 
 RUN apt install -y -q apache2 \
-    apache2-doc \
     apache2-utils \
     libexpat1 
 
-RUN a2enmod rewrite expires
+RUN a2enmod rewrite
 
 RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
 RUN dpkg -i mod-pagespeed-*.deb
@@ -101,5 +100,4 @@ RUN chmod -R g+rw /var/www && chown -R www-data:www-data /var/www
 EXPOSE 443 80
 
 HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl -f http://localhost || exit 1
-RUN apachectl -D FOREGROUND 
 CMD ["/bin/autostart/autostart.sh"]
