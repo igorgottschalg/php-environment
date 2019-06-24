@@ -48,8 +48,6 @@ RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_
 RUN dpkg -i mod-pagespeed-*.deb
 RUN apt -f install
 
-RUN apt install libapache2-mod-proxy-html libxml2-dev
-
 RUN a2enmod proxy
 RUN a2enmod proxy_http
 RUN a2enmod proxy_ajp
