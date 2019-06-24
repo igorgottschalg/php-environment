@@ -49,6 +49,7 @@ RUN dpkg -i mod-pagespeed-*.deb
 RUN apt -f install
 
 RUN a2enmod proxy
+RUN a2dismod ssl
 RUN a2enmod proxy_http
 RUN a2enmod proxy_ajp
 RUN a2enmod rewrite
