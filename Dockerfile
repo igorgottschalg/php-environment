@@ -102,10 +102,13 @@ ADD ./supervisord.conf /etc/supervisord.conf
 
 RUN chmod +x /bin/autostart/autostart.sh
 
-RUN curl -L  https://br.wordpress.org/wordpress-5.2.1-pt_BR.tar.gz | tar -xz -C /var/www/html
+RUN curl -L  https://br.wordpress.org/wordpress-5.2.2-pt_BR.tar.gz | tar -xz -C /var/www/html
 RUN mv /var/www/html/wordpress/* /var/www/html/
 RUN rm -Rf /var/www/html/wordpress
-RUN chmod -R g+rw /var/www && chown -R www-data:www-data /var/www
+
+RUN chown www-data:www-data  -R /var/www*
+RUN find /var/www -type d -exec chmod 755 {} \;
+RUN find /var/www -type f -exec chmod 644 {} \;
 
 EXPOSE 443 80
 
