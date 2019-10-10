@@ -1,17 +1,17 @@
 stages:
   - Build
 
-image: docker:latest
-
 variables:
   DOCKER_DRIVER: overlay
+  IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 services:
   - docker:dind
 
 Build image:
   stage: Build
+  image: docker:latest
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t registry.gitlab.com/gottschalg/wordpress-container:apache .
-    - docker push registry.gitlab.com/gottschalg/wordpress-container:apache
+    - docker build -t $IMAGE --cache-from $IMAGE .
+    - docker push $IMAGE
