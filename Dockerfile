@@ -6,6 +6,13 @@ ENV RG_LOG_LEVEL 0
 ENV RG_ACT_TOKEN ""
 ENV RG_ACT_HOST ""
 ENV RG_MEMCACHED_SERVERS "memcached:11211"
+ENV php_conf /etc/php/7.3/apache2/php.ini
+ENV WORDPRESS_URL https://br.wordpress.org/latest-pt_BR.tar.gz
+
+ARG MAKE_J=4
+ARG NGINX_VERSION=1.14.0
+ARG PAGESPEED_VERSION=1.13.35.2
+ARG LIBPNG_VERSION=1.6.29
 
 RUN apt update
 RUN apt list --upgradable
@@ -33,12 +40,6 @@ RUN apt install -q -y nano \
     cron \
     supervisor
 
-ARG MAKE_J=4
-ARG NGINX_VERSION=1.14.0
-ARG PAGESPEED_VERSION=1.13.35.2
-ARG LIBPNG_VERSION=1.6.29
-
-ENV php_conf /etc/php/7.2/apache2/php.ini
 
 RUN apt install -y -q apache2 \
     apache2-utils \
@@ -58,22 +59,37 @@ RUN a2enmod headers
 RUN a2enmod proxy_balancer
 RUN a2enmod proxy_connect
 RUN a2enmod proxy_html
+RUN a2enmod http2
+RUN a2enmod filter
+RUN a2enmod speling
+RUN a2enmod substitute
+
+RUN apt install -q -y software-properties-common
+RUN add-apt-repository ppa:ondrej/php
+RUN apt update
 
 RUN apt install -q -y \
-    php \
-    libapache2-mod-php7.2 \
-    php7.2-soap \
-    php7.2-json \
+    php7.3 \
+    libapache2-mod-php7.3 \
+    php7.3-common \
+    php7.3-xmlrpc \
+    php7.3-imagick \
+    php7.3-cli \
+    php7.3-imap \ 
+    php7.3-opcache \
+    php7.3-intl \
+    php7.3-soap \
+    php7.3-json \
     php-pear \
-    php7.2-dev \
-    php7.2-zip \
-    php7.2-curl \
-    php7.2-gd \
-    php7.2-mysql \
-    php7.2-xml \
-    php7.2-memcached \
-    libapache2-mod-php7.2 \
-    php7.2-mbstring \
+    php7.3-dev \
+    php7.3-zip \
+    php7.3-curl \
+    php7.3-gd \
+    php7.3-mysql \
+    php7.3-xml \
+    php7.3-memcached \
+    libapache2-mod-php7.3 \
+    php7.3-mbstring \
     graphicsmagick \
     imagemagick \
     ca-certificates
@@ -102,7 +118,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 
 RUN chmod +x /bin/autostart/autostart.sh
 
-RUN curl -L  https://br.wordpress.org/wordpress-5.2.2-pt_BR.tar.gz | tar -xz -C /var/www/html
+RUN curl -L "$WORDPRESS_URL" | tar -xz -C /var/www/html
 RUN mv /var/www/html/wordpress/* /var/www/html/
 RUN rm -Rf /var/www/html/wordpress
 
