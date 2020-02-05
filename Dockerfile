@@ -123,6 +123,8 @@ RUN mkdir -p /bin/autostart
 ADD supervisord.conf /etc/supervisor/conf.d/default.conf
 RUN touch /var/www/html/heartbeat.html
 
+WORKDIR /var/www/html
+
 EXPOSE 443 80
 HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl -f http://localhost/heartbeat.html || exit 1
 CMD ["/bin/sh", "-c", "/usr/bin/supervisord -n"]
