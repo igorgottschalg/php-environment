@@ -12,10 +12,7 @@ ARG MAKE_J=4
 ARG LIBPNG_VERSION=1.6.29
 
 RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
-
-RUN apt update
-RUN apt list --upgradable
-RUN apt update
+RUN apt update && apt list --upgradable && apt update
 
 RUN apt install -q -y nano \
     curl \
@@ -38,17 +35,13 @@ RUN apt install -q -y nano \
     mc \
     cron \
     supervisor \
-    memcached
-
-RUN apt install -y -q apache2 \
+    memcached \
+    apache2 \
     apache2-utils \
     apache2-dev \
-    libexpat1 \
-    brotli
+    libexpat1
 
-RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb
-RUN dpkg -i mod-pagespeed-*.deb
-RUN apt -f install
+RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb && dpkg -i mod-pagespeed-*.deb && apt -f install
 
 RUN a2enmod proxy && \
     a2dismod ssl && \
@@ -67,13 +60,11 @@ RUN a2enmod proxy && \
     a2enmod brotli && \
     a2enmod expires
 
-RUN apt -y install lsb-release apt-transport-https ca-certificates
-RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
-RUN echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list
-RUN apt update
+RUN apt -y install lsb-release apt-transport-https ca-certificates && \
+    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
+    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && apt update
 
-RUN apt install -q -y php7.4
-RUN apt install -q -y \
+RUN apt install -q -y php7.4 \
     php7.4-bcmath \
     php7.4-bz2 \
     php7.4-common \
@@ -94,10 +85,13 @@ RUN apt install -q -y \
     php7.4-memcached \
     php7.4-mbstring \
     php7.4-tidy \
-    php7.4-ssh2
-
-RUN apt install -q -y libapache2-mod-php7.4 php-pear graphicsmagick imagemagick php-redis php-memcached
-RUN phpenmod memcached
+    php7.4-ssh2 \
+    libapache2-mod-php7.4 \
+    php-pear \
+    graphicsmagick \
+    imagemagick \
+    php-redis \
+    php-memcached
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
@@ -106,22 +100,20 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
     && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
 
-RUN apt autoremove -y && apt clean && rm -rf /tmp/*
-
-RUN mkdir -p /var/log/supervisor && \
-    mkdir -p /etc/letsencrypt/webrootauth
+RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
+    mkdir -p /var/log/supervisor && \
+    mkdir -p /etc/letsencrypt/webrootauth && \
+    phpenmod memcached
 
 RUN mkdir -p /usr/bin/ && \
     rm -Rf /var/www/* && \
-    mkdir /var/www/html/
-
-RUN chown www-data:www-data  -R /var/www*
-
-RUN touch /var/log/cron.log
-RUN mkdir -p /bin/autostart
+    mkdir /var/www/html/ ** \
+    chown www-data:www-data -R /var/www* && \
+    touch /var/log/cron.log && \
+    touch /var/www/html/heartbeat.html && \
+    mkdir -p /bin/autostart
 
 ADD supervisord.conf /etc/supervisor/conf.d/default.conf
-RUN touch /var/www/html/heartbeat.html
 
 WORKDIR /var/www/html
 
