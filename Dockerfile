@@ -106,7 +106,7 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
     && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
 
-RUN apt autoremove -y && apt clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+RUN apt autoremove -y && apt clean && rm -rf /tmp/*
 
 RUN mkdir -p /var/log/supervisor && \
     mkdir -p /etc/letsencrypt/webrootauth
