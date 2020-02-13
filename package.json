@@ -8,6 +8,9 @@
   "scripts": {
     "version": "auto-changelog -p && git add CHANGELOG.md"
   },
+  "hooks": {
+    "pre-commit": "npm-auto-version && auto-changelog -p"
+  },
   "auto-changelog": {
     "output": "CHANGELOG.md",
     "template": "keepachangelog",
@@ -19,6 +22,8 @@
     ]
   },
   "devDependencies": {
-    "auto-changelog": "^1.16.2"
+    "auto-changelog": "^1.16.2",
+    "husky": "^4.2.3",
+    "npm-auto-version": "^1.0.0"
   }
 }

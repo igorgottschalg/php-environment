@@ -5,7 +5,6 @@ ENV RG_WAN_PORT 2408
 ENV RG_LOG_LEVEL 0
 ENV RG_ACT_TOKEN ""
 ENV RG_ACT_HOST ""
-ENV RG_MEMCACHED_SERVERS "memcached:11211"
 ENV php_conf /etc/php/7.4/apache2/php.ini
 
 ARG MAKE_J=4
@@ -13,14 +12,13 @@ ARG LIBPNG_VERSION=1.6.29
 
 RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
 
-RUN apt -y install lsb-release apt-transport-https ca-certificates && \
+RUN apt update && apt -y install wget lsb-release apt-transport-https ca-certificates && \
     wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && apt update
+    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
+    apt update
 
 RUN apt install -q -y nano \
     curl \
-    git \
-    wget \
     iputils-ping \
     zlibc \
     zlib1g \
@@ -38,11 +36,11 @@ RUN apt install -q -y nano \
     mc \
     cron \
     supervisor \
-    memcached \
     apache2 \
     apache2-utils \
     apache2-dev \
     libexpat1 \
+    brotli \
     php7.4 \
     php7.4-bcmath \
     php7.4-bz2 \
@@ -61,7 +59,6 @@ RUN apt install -q -y nano \
     php7.4-gd \
     php7.4-mysql \
     php7.4-xml \
-    php7.4-memcached \
     php7.4-mbstring \
     php7.4-tidy \
     php7.4-ssh2 \
@@ -69,8 +66,8 @@ RUN apt install -q -y nano \
     php-pear \
     graphicsmagick \
     imagemagick \
-    php-redis \
-    php-memcached
+    php-redis
+
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
@@ -99,22 +96,19 @@ RUN a2enmod proxy && \
     a2enmod expires
 
 RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
-    mkdir -p /var/log/supervisor && \
-    mkdir -p /etc/letsencrypt/webrootauth && \
-    phpenmod memcached && \
-    mkdir -p /usr/bin/ && \
     rm -Rf /var/www/* && \
-    mkdir /var/www/html/ ** \
+    rm -Rf /etc/apache2/sites-available/default-ssl.conf && \
+    mkdir -p /var/log/supervisor && \
+    mkdir -p /usr/bin && \
+    mkdir -p /var/www/html && \
+    mkdir -p /bin/autostart && \
     chown www-data:www-data -R /var/www* && \
     touch /var/log/cron.log && \
-    touch /var/www/html/heartbeat.html && \
-    mkdir -p /bin/autostart && \
-    rm -Rf /etc/apache2/sites-available/default-ssl.conf
+    touch /var/www/html/heartbeat.html
 
-COPY supervisord.conf /etc/supervisor/conf.d/default.conf
-
-COPY config/apache/PageSpeed.conf /etc/apache2/mods-available/pagespeed.conf
-COPY config/apache/Apache.conf /etc/apache2/apache2.conf
+COPY config/supervisord.conf /etc/supervisor/conf.d/default.conf
+COPY config/PageSpeed.conf   /etc/apache2/mods-available/pagespeed.conf
+COPY config/Apache.conf      /etc/apache2/apache2.conf
 
 WORKDIR /var/www/html
 
