@@ -7,8 +7,7 @@
   "license": "MIT",
   "husky": {
     "hooks": {
-      "post-commit": "auto-changelog -p",
-      "pre-push": "git add CHANGELOG.md && git commit --amend --no-edit"
+      "pre-push": "auto-changelog -p && git add CHANGELOG.md && git commit --amend --no-edit"
     }
   },
   "auto-changelog": {
