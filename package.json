@@ -6,11 +6,11 @@
   "author": "Igor Gottschalg <igor@gottschalg.mobi>",
   "license": "MIT",
   "scripts": {
-    "version": "auto-changelog -p -v && git add CHANGELOG.md",
+    "version": "npm-auto-version && auto-changelog -p && git add CHANGELOG.md",
     "change-version": "npm-auto-version"
   },
   "hooks": {
-    "pre-commit": "npm-auto-version && auto-changelog -p && git add CHANGELOG.md"
+    "pre-commit": "yarn version"
   },
   "auto-changelog": {
     "output": "CHANGELOG.md",
