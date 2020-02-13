@@ -1,19 +1,19 @@
 {
   "name": "php-environment",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "PHP 7.4 with apache2 and Google PageSpeed Modules",
   "repository": "git@github.com:igorgottschalg/php-environment.git",
   "author": "Igor Gottschalg <igor@gottschalg.mobi>",
   "license": "MIT",
   "scripts": {
-    "version": "auto-changelog -p && git add CHANGELOG.md"
+    "version": "auto-changelog -p"
   },
   "hooks": {
-    "pre-commit": "npm-auto-version && auto-changelog -p"
+    "pre-commit": "npm-auto-version && auto-changelog -p && git add CHANGELOG.md"
   },
   "auto-changelog": {
     "output": "CHANGELOG.md",
-    "template": "keepachangelog",
+    "template": "changelog-template.hbs",
     "unreleased": true,
     "commitLimit": false,
     "includeBranch": [
