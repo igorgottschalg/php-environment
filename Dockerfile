@@ -11,7 +11,11 @@ ENV php_conf /etc/php/7.4/apache2/php.ini
 ARG MAKE_J=4
 ARG LIBPNG_VERSION=1.6.29
 
-RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale && apt update && apt list --upgradable && apt update
+RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
+
+RUN apt -y install lsb-release apt-transport-https ca-certificates && \
+    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
+    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && apt update
 
 RUN apt install -q -y nano \
     curl \
@@ -67,10 +71,6 @@ RUN apt install -q -y nano \
     imagemagick \
     php-redis \
     php-memcached
-
-RUN apt -y install lsb-release apt-transport-https ca-certificates && \
-    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && apt update
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
