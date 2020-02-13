@@ -6,7 +6,7 @@
 
 - Change auto changelog hook [`0a73383`](https://github.com/igorgottschalg/php-environment/commit/0a733839a6087f6694026dc06b537d443799f768)
 - change git hook [`bbd10b1`](https://github.com/igorgottschalg/php-environment/commit/bbd10b194b142633361af68bdd9240c24d081ebf)
-- Change auto changelog to post-commit hook [`16ce420`](https://github.com/igorgottschalg/php-environment/commit/16ce42000bb347cfa9ec4b49d8ec74bd270a911e)
+- Change auto changelog to post-commit hook [`b040956`](https://github.com/igorgottschalg/php-environment/commit/b040956305a35c5b99735ff378352d225c9b714e)
 
 ## [v1.1.4](https://github.com/igorgottschalg/php-environment/compare/v1.1.2...v1.1.4) - 2020-02-13
 
