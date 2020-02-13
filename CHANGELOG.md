@@ -1,12 +1,19 @@
 ### Changelog
 
+## [v1.1.6](https://github.com/igorgottschalg/php-environment/compare/v1.1.5...v1.1.6) - 2020-02-13
+
+### Commits
+
+- change git hook [`bbd10b1`](https://github.com/igorgottschalg/php-environment/commit/bbd10b194b142633361af68bdd9240c24d081ebf)
+- Change auto changelog to post-commit hook [`b040956`](https://github.com/igorgottschalg/php-environment/commit/b040956305a35c5b99735ff378352d225c9b714e)
+- Fix git hook loop [`c7f0205`](https://github.com/igorgottschalg/php-environment/commit/c7f0205f3e0ee1f030a317e73dc80a2c47615651)
+
 ## [v1.1.5](https://github.com/igorgottschalg/php-environment/compare/v1.1.4...v1.1.5) - 2020-02-13
 
 ### Commits
 
 - Change auto changelog hook [`0a73383`](https://github.com/igorgottschalg/php-environment/commit/0a733839a6087f6694026dc06b537d443799f768)
-- change git hook [`bbd10b1`](https://github.com/igorgottschalg/php-environment/commit/bbd10b194b142633361af68bdd9240c24d081ebf)
-- Change auto changelog to post-commit hook [`b040956`](https://github.com/igorgottschalg/php-environment/commit/b040956305a35c5b99735ff378352d225c9b714e)
+- Change auto changelog hook [`1919dd2`](https://github.com/igorgottschalg/php-environment/commit/1919dd2c8cefb5cc642c3dc4a2b34188c98c602d)
 
 ## [v1.1.4](https://github.com/igorgottschalg/php-environment/compare/v1.1.2...v1.1.4) - 2020-02-13
 
