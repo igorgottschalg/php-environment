@@ -7,7 +7,6 @@ ENV RG_ACT_TOKEN ""
 ENV RG_ACT_HOST ""
 ENV RG_MEMCACHED_SERVERS "memcached:11211"
 ENV php_conf /etc/php/7.3/apache2/php.ini
-ENV WORDPRESS_URL https://br.wordpress.org/latest-pt_BR.tar.gz
 
 ARG MAKE_J=4
 ARG NGINX_VERSION=1.14.0
@@ -118,7 +117,7 @@ ADD ./supervisord.conf /etc/supervisord.conf
 
 RUN chmod +x /bin/autostart/autostart.sh
 
-RUN curl -L "$WORDPRESS_URL" | tar -xz -C /var/www/html
+RUN curl -L https://wordpress.org/latest.tar.gz | tar -xz -C /var/www/html
 RUN mv /var/www/html/wordpress/* /var/www/html/
 RUN rm -Rf /var/www/html/wordpress
 
