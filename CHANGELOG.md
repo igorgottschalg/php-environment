@@ -1,10 +1,10 @@
 ### Changelog
 
-## [v1.1.7](https://github.com/igorgottschalg/php-environment/compare/v1.1.6...v1.1.7) - 2020-02-13
+## [v1.1.8](https://github.com/igorgottschalg/php-environment/compare/v1.1.6...v1.1.8) - 2020-02-13
 
 ### Commits
 
-- Change auto changelog to post-commit hook [`5615ab1`](https://github.com/igorgottschalg/php-environment/commit/5615ab16271d8223517ac566aca3e43974533450)
+- Change auto changelog to post-commit hook [`53fa786`](https://github.com/igorgottschalg/php-environment/commit/53fa786ca1db4d7a6b044155e2e40752c585f8e4)
 
 ## [v1.1.6](https://github.com/igorgottschalg/php-environment/compare/v1.1.5...v1.1.6) - 2020-02-13
 

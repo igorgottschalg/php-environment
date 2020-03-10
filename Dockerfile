@@ -113,5 +113,4 @@ COPY config/Apache.conf      /etc/apache2/apache2.conf
 WORKDIR /var/www/html
 
 EXPOSE 443 80
-HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl -f http://localhost/heartbeat.html || exit 1
 CMD ["/bin/sh", "-c", "/usr/bin/supervisord -n"]
