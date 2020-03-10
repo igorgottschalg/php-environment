@@ -1,5 +1,11 @@
 ### Changelog
 
+## [v1.1.10](https://github.com/igorgottschalg/php-environment/compare/v1.1.9...v1.1.10) - 2020-03-10
+
+### Commits
+
+- Change Git Hook [`758458b`](https://github.com/igorgottschalg/php-environment/commit/758458b02e217a8f14aab568497465da083a02d7)
+
 ## [v1.1.9](https://github.com/igorgottschalg/php-environment/compare/v1.1.8...v1.1.9) - 2020-03-10
 
 ### Commits

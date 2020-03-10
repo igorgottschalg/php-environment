@@ -79,7 +79,7 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
 RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb && dpkg -i mod-pagespeed-*.deb && apt -f install && rm mod-pagespeed-stable_current_amd64.deb
 
 RUN a2enmod proxy && \
-    a2dismod ssl && \
+    a2enmod ssl && \
     a2enmod proxy_http && \
     a2enmod proxy_ajp && \
     a2enmod rewrite && \
