@@ -1,5 +1,11 @@
 ### Changelog
 
+## [v1.1.9](https://github.com/igorgottschalg/php-environment/compare/v1.1.8...v1.1.9) - 2020-03-10
+
+### Commits
+
+- Remove healcheck to use externally [`4a42565`](https://github.com/igorgottschalg/php-environment/commit/4a42565803bc666e846fc18b6d81fa41c7e2748f)
+
 ## [v1.1.8](https://github.com/igorgottschalg/php-environment/compare/v1.1.6...v1.1.8) - 2020-02-13
 
 ### Commits

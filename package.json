@@ -1,6 +1,6 @@
 {
   "name": "php-environment",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "PHP 7.4 with apache2 and Google PageSpeed Modules",
   "repository": "git@github.com:igorgottschalg/php-environment.git",
   "author": "Igor Gottschalg <igor@gottschalg.mobi>",
@@ -10,8 +10,7 @@
   },
   "husky": {
     "hooks": {
-      "post-commit": "yarn changelog",
-      "pre-push": "git commit --amend --no-edit"
+      "post-commit": "yarn changelog"
     }
   },
   "auto-changelog": {
