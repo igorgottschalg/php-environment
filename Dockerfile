@@ -2,25 +2,31 @@ FROM php:7.4-apache
 
 ENV php_conf /usr/local/etc/php/php.ini-production
 
-RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
-
 ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
-RUN chmod uga+x /usr/local/bin/install-php-extensions && sync
+RUN chmod uga+x /usr/local/bin/install-php-extensions && sync \
+    && echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q \
     && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y \
       curl \
       zip \
       unzip \
-      wget
-
-RUN install-php-extensions \
+      wget \
+      autotools-dev \
+      automake \
+      libtool \
+      m4 \
+      git \
+      brotli \
+      apache2-dev\
+    && install-php-extensions \
       bcmath \
       bz2 \
       gd \
       intl \
       memcached \
+      memcache \
       mysqli \
       opcache \
       pdo_mysql \
@@ -29,8 +35,9 @@ RUN install-php-extensions \
       xsl \
       zip \
       sockets \
-      apcu
-
+      apcu \
+      tidy \
+      ssh2
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
@@ -42,11 +49,21 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s:;opcache.enable_cli=0:opcache.enable_cli=1:" ${php_conf} \
     && sed -i "s:;opcache.memory_consumption=64:opcache.memory_consumption=256:" ${php_conf} \
     && sed -i "s:;opcache.max_accelerated_files=2000:opcache.max_accelerated_files=1000000:" ${php_conf} \
-    && sed -i "s:;opcache.validate_timestamps=1:opcache.validate_timestamps=3000:" ${php_conf}
+    && sed -i "s:;opcache.validate_timestamps=1:opcache.validate_timestamps=3000:" ${php_conf} \
+    && echo extension=apcu.so > ${php_conf}
 
-RUN echo extension=apcu.so > ${php_conf}
-
-RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb && dpkg -i mod-pagespeed-*.deb && apt -f install && rm mod-pagespeed-stable_current_amd64.deb
+RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb \
+    && dpkg -i mod-pagespeed-*.deb \
+    && apt -f install \
+    && rm mod-pagespeed-stable_current_amd64.deb \
+    && cd / \
+    && git clone --depth=1 --recursive https://github.com/kjdev/apache-mod-brotli.git \
+    && cd /apache-mod-brotli \
+    && ./autogen.sh \
+    && ./configure \
+    && make \
+    && install -D .libs/mod_brotli.so /usr/lib/apache2/modules/mod_brotli.so -m 644 \
+    && cd /etc/apache2/mods-available && echo "LoadModule brotli_module /usr/lib/apache2/modules/mod_brotli.so" > brotli.load
 
 RUN a2enmod proxy && \
     a2enmod ssl && \
