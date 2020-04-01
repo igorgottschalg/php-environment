@@ -1,72 +1,35 @@
-FROM debian:stable-slim
+FROM php:7.4-apache
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV RG_WAN_PORT 2408
-ENV RG_LOG_LEVEL 0
-ENV RG_ACT_TOKEN ""
-ENV RG_ACT_HOST ""
-ENV php_conf /etc/php/7.4/apache2/php.ini
-
-ARG MAKE_J=4
-ARG LIBPNG_VERSION=1.6.29
+ENV php_conf /usr/local/etc/php/php.ini-production
 
 RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
 
-RUN apt update && apt -y install wget lsb-release apt-transport-https ca-certificates && \
-    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
-    apt update
+ADD https://raw.githubusercontent.com/mlocati/docker-php-extension-installer/master/install-php-extensions /usr/local/bin/
 
-RUN apt install -q -y nano \
-    curl \
-    iputils-ping \
-    zlibc \
-    zlib1g \
-    zlib1g-dev \
-    zip \
-    unzip \
-    build-essential \
-    libpcre3 \
-    libpcre3-dev \
-    openssl \
-    uuid-dev \
-    libssl-dev \
-    libperl-dev \
-    procps \
-    mc \
-    cron \
-    supervisor \
-    apache2 \
-    apache2-utils \
-    apache2-dev \
-    libexpat1 \
-    brotli \
-    php7.4 \
-    php7.4-bcmath \
-    php7.4-bz2 \
-    php7.4-common \
-    php7.4-xmlrpc \
-    php7.4-imagick \
-    php7.4-cli \
-    php7.4-imap \
-    php7.4-opcache \
-    php7.4-intl \
-    php7.4-soap \
-    php7.4-json \
-    php7.4-dev \
-    php7.4-zip \
-    php7.4-curl \
-    php7.4-gd \
-    php7.4-mysql \
-    php7.4-xml \
-    php7.4-mbstring \
-    php7.4-tidy \
-    php7.4-ssh2 \
-    libapache2-mod-php7.4 \
-    php-pear \
-    graphicsmagick \
-    imagemagick \
-    php-redis
+RUN chmod uga+x /usr/local/bin/install-php-extensions && sync
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -q \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y \
+      curl \
+      zip \
+      unzip \
+      wget
+
+RUN install-php-extensions \
+      bcmath \
+      bz2 \
+      gd \
+      intl \
+      memcached \
+      mysqli \
+      opcache \
+      pdo_mysql \
+      redis \
+      soap \
+      xsl \
+      zip \
+      sockets \
+      apcu
 
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
@@ -74,7 +37,14 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
     && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
-    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
+    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf} \
+    && sed -i "s:;opcache.enable=0:opcache.enable=1:" ${php_conf} \
+    && sed -i "s:;opcache.enable_cli=0:opcache.enable_cli=1:" ${php_conf} \
+    && sed -i "s:;opcache.memory_consumption=64:opcache.memory_consumption=256:" ${php_conf} \
+    && sed -i "s:;opcache.max_accelerated_files=2000:opcache.max_accelerated_files=1000000:" ${php_conf} \
+    && sed -i "s:;opcache.validate_timestamps=1:opcache.validate_timestamps=3000:" ${php_conf}
+
+RUN echo extension=apcu.so > ${php_conf}
 
 RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb && dpkg -i mod-pagespeed-*.deb && apt -f install && rm mod-pagespeed-stable_current_amd64.deb
 
@@ -93,7 +63,8 @@ RUN a2enmod proxy && \
     a2enmod speling && \
     a2enmod substitute && \
     a2enmod brotli && \
-    a2enmod expires
+    a2enmod expires && \
+    a2enmod deflate
 
 RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
     rm -Rf /var/www/* && \
@@ -113,4 +84,4 @@ COPY config/Apache.conf      /etc/apache2/apache2.conf
 WORKDIR /var/www/html
 
 EXPOSE 443 80
-CMD ["/bin/sh", "-c", "/usr/bin/supervisord -n"]
+CMD ["apache2-foreground"]
