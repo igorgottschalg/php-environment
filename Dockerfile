@@ -1,5 +1,7 @@
 FROM gottschalg/php-environment
 
+WORKDIR /var/www/html
+
 RUN mkdir -p /var/www/html/loja
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
