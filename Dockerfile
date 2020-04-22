@@ -110,6 +110,9 @@ COPY config/supervisord.conf /etc/supervisor/conf.d/default.conf
 COPY config/PageSpeed.conf   /etc/apache2/mods-available/pagespeed.conf
 COPY config/Apache.conf      /etc/apache2/apache2.conf
 
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
+
 WORKDIR /var/www/html
 
 EXPOSE 443 80
