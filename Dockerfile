@@ -76,8 +76,6 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
     && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
 
-RUN wget https://dl-ssl.google.com/dl/linux/direct/mod-pagespeed-stable_current_amd64.deb && dpkg -i mod-pagespeed-*.deb && apt -f install && rm mod-pagespeed-stable_current_amd64.deb
-
 RUN a2enmod proxy && \
     a2enmod ssl && \
     a2enmod proxy_http && \
@@ -107,8 +105,6 @@ RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
     touch /var/www/html/heartbeat.html
 
 COPY config/supervisord.conf /etc/supervisor/conf.d/default.conf
-COPY config/PageSpeed.conf   /etc/apache2/mods-available/pagespeed.conf
-COPY config/Apache.conf      /etc/apache2/apache2.conf
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
