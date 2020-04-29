@@ -105,6 +105,7 @@ RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
     touch /var/www/html/heartbeat.html
 
 COPY config/supervisord.conf /etc/supervisor/conf.d/default.conf
+COPY config/apache.conf /etc/apache2/apache2.conf
 
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
