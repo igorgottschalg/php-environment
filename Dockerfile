@@ -62,6 +62,7 @@ RUN apt install -q -y nano \
     php7.4-mbstring \
     php7.4-tidy \
     php7.4-ssh2 \
+    php7.4-xdebug \
     libapache2-mod-php7.4 \
     php-pear \
     graphicsmagick \
@@ -74,7 +75,8 @@ RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
     && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
-    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
+    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf} \
+    && echo "xdebug.show_error_trace = 1" > /etc/php/7.4/mods-available/xdebug.ini
 
 RUN a2enmod proxy && \
     a2enmod ssl && \
