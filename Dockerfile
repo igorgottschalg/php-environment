@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM gcr.io/google-appengine/debian9
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV RG_WAN_PORT 2408
@@ -40,7 +40,9 @@ RUN apt install -q -y nano \
     apache2-utils \
     apache2-dev \
     libexpat1 \
-    brotli \
+    brotli
+    
+RUN apt install -q -y \
     php7.4 \
     php7.4-bcmath \
     php7.4-bz2 \
@@ -69,14 +71,14 @@ RUN apt install -q -y nano \
     imagemagick \
     php-redis
 
+RUN pecl install xdebug && echo 'zend_extension="/usr/lib/php/20190902/xdebug.so"' > /etc/php/7.4/mods-available/xdebug.ini
 
 RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
     && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
     && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
     && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${php_conf} \
     && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
-    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf} \
-    && echo "xdebug.show_error_trace = 1" > /etc/php/7.4/mods-available/xdebug.ini
+    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
 
 RUN a2enmod proxy && \
     a2enmod ssl && \
