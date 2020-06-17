@@ -1,6 +1,6 @@
 {
   "name": "php-environment",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "PHP 7.4 with apache2 and Google PageSpeed Modules",
   "repository": "git@github.com:igorgottschalg/php-environment.git",
   "author": "Igor Gottschalg <igor@gottschalg.mobi>",

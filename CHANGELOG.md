@@ -1,5 +1,11 @@
 ### Changelog
 
+## [v1.1.1](https://github.com/igorgottschalg/php-environment/compare/v1.1.0...v1.1.1) - 2020-06-17
+
+### Commits
+
+- Remove brotli [`2045381`](https://github.com/igorgottschalg/php-environment/commit/20453816103f7f9cc27da9f27290fd0522fdf3b3)
+
 ## v1.1.0 - 2020-06-17
 
 ### Commits
