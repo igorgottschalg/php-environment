@@ -39,8 +39,7 @@ RUN apt install -q -y nano \
     apache2 \
     apache2-utils \
     apache2-dev \
-    libexpat1 \
-    brotli
+    libexpat1
     
 RUN apt install -q -y \
     php7.4 \
