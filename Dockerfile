@@ -19,6 +19,7 @@ RUN \
         nodejs \
         npm \
         yarn && \
+        nginx && \
     apk add --no-cache --virtual .build-deps \
         $PHPIZE_DEPS \
         icu-dev && \
