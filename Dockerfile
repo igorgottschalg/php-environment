@@ -5,6 +5,7 @@ RUN \
         freetype-dev \
         git \
         icu-libs \
+        libzip-dev \
         libjpeg-turbo-dev \
         libmcrypt-dev \
         libpng-dev \
@@ -18,16 +19,18 @@ RUN \
         ssmtp \
         nodejs \
         npm \
-        yarn && \
-        nginx && \
-    apk add --no-cache --virtual .build-deps \
-        $PHPIZE_DEPS \
-        icu-dev && \
-    docker-php-ext-configure bcmath && \
-    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+        yarn
+RUN apk add --no-cache --virtual .build-deps \
+    $PHPIZE_DEPS icu-dev && \
+    pecl install -f xdebug-2.9.6 && \
+    pecl install apcu mcrypt-1.0.1 && \
+    pecl install apcu redis
+
+RUN docker-php-ext-configure bcmath && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
     docker-php-ext-install -j$(nproc) \
-	sockets \
-	pcntl \
+        sockets \
+        pcntl \
         bcmath \
         intl \
         gd \
@@ -35,23 +38,28 @@ RUN \
         pdo_mysql \
         soap \
         xsl \
-	dom \
+	    dom \
         zip && \
-    yes "" | pecl install apcu redis && \
-    docker-php-ext-enable apcu redis && \
-    pecl install apcu mcrypt-1.0.1 && \
-    perl -pi -e "s/mailhub=mail/mailhub=maildev/" /etc/ssmtp/ssmtp.conf && \
-    perl -pi -e "s|;pm.status_path = /status|pm.status_path = /php_fpm_status|g" /usr/local/etc/php-fpm.d/www.conf && \
+    docker-php-ext-enable xdebug && \
+    docker-php-ext-enable redis && \
     yarn global add grunt-cli && \
-    apk del .build-deps && \
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
-    yes "" | pecl install -f xdebug-2.6.1 && \
-    docker-php-ext-enable xdebug
+    apk del .build-deps
 
-## Install Composer globally
+RUN apk add --no-cache nginx py-pip
+RUN pip install supervisor
+
+RUN mkdir -p /var/log/supervisor && \
+    mkdir -p /var/www/html && \
+    mkdir -p /bin/autostart && \
+    chown www-data:www-data -R /var/www* && \
+    touch /var/log/cron.log && \
+    touch /var/www/html/heartbeat.html
+
+ADD supervisord.conf /etc/supervisor/conf.d/default.conf
+
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer global require "hirak/prestissimo:dev-master" --no-suggest --optimize-autoloader --classmap-authoritative
 
-CMD ["php-fpm"]
+CMD ["supervisord", "-c", "/etc/supervisor.conf"]
