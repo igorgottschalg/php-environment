@@ -5,7 +5,7 @@ ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10" \
-    PHP_CONFIG /etc/php/7.4/apache2/php.ini
+    PHP_CONFIG=/etc/php/7.4/apache2/php.ini
 
 
 RUN apt-get update \
@@ -62,8 +62,6 @@ RUN mkdir -p /var/log/supervisor && \
 ADD ./configs/supervisord.conf /etc/supervisor/conf.d/default.conf
 ADD ./configs/nginx.conf /etc/nginx/nginx.conf
 ADD ./configs/opcache.ini /usr/local/etc/php.d/opcache.ini
-
-ADD ./magento/* /var/www/html
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 RUN \
