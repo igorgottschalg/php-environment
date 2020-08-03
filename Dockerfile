@@ -4,8 +4,7 @@ FROM php:7.4-fpm
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
-    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10" \
-    PHP_CONFIG=/etc/php/7.4/php.ini
+    PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
 
 
 RUN apt-get update \
@@ -46,12 +45,15 @@ RUN docker-php-ext-enable xdebug && \
     docker-php-ext-enable redis && \
     docker-php-ext-enable mcrypt
 
-RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 2048M/g" ${PHP_CONFIG} \
-    && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${PHP_CONFIG} \
-    && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${PHP_CONFIG} \
-    && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${PHP_CONFIG} \
-    && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${PHP_CONFIG} \
-    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${PHP_CONFIG}
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
+ENV PHP_INI_DIR=${PHP_INI_DIR}/php.ini
+
+RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 2048M/g" ${PHP_INI_DIR} \
+    && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${PHP_INI_DIR} \
+    && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${PHP_INI_DIR} \
+    && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${PHP_INI_DIR} \
+    && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${PHP_INI_DIR} \
+    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${PHP_INI_DIR}
 
 RUN mkdir -p /var/log/supervisor && \
     mkdir -p /var/www/html && \
