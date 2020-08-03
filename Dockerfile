@@ -1,118 +1,56 @@
-FROM gcr.io/google-appengine/debian9
+FROM php:7.4-fpm-alpine
 
-ENV DEBIAN_FRONTEND noninteractive
-ENV RG_WAN_PORT 2408
-ENV RG_LOG_LEVEL 0
-ENV RG_ACT_TOKEN ""
-ENV RG_ACT_HOST ""
-ENV php_conf /etc/php/7.4/apache2/php.ini
+RUN \
+    apk add --no-cache --virtual .persistent-deps \
+        freetype-dev \
+        git \
+        icu-libs \
+        libjpeg-turbo-dev \
+        libmcrypt-dev \
+        libpng-dev \
+        libxml2-dev \
+        libxml2-utils \
+        libxslt-dev \
+        openssh-client \
+	    mysql-client \
+        patch \
+        perl \
+        ssmtp \
+        nodejs \
+        npm \
+        yarn && \
+    apk add --no-cache --virtual .build-deps \
+        $PHPIZE_DEPS \
+        icu-dev && \
+    docker-php-ext-configure bcmath && \
+    docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ && \
+    docker-php-ext-install -j$(nproc) \
+	sockets \
+	pcntl \
+        bcmath \
+        intl \
+        gd \
+        opcache \
+        pdo_mysql \
+        soap \
+        xsl \
+	dom \
+        zip && \
+    yes "" | pecl install apcu redis && \
+    docker-php-ext-enable apcu redis && \
+    pecl install apcu mcrypt-1.0.1 && \
+    perl -pi -e "s/mailhub=mail/mailhub=maildev/" /etc/ssmtp/ssmtp.conf && \
+    perl -pi -e "s|;pm.status_path = /status|pm.status_path = /php_fpm_status|g" /usr/local/etc/php-fpm.d/www.conf && \
+    yarn global add grunt-cli && \
+    apk del .build-deps && \
+    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
+    yes "" | pecl install -f xdebug-2.6.1 && \
+    docker-php-ext-enable xdebug
 
-ARG MAKE_J=4
-ARG LIBPNG_VERSION=1.6.29
+## Install Composer globally
+ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    composer global require "hirak/prestissimo:dev-master" --no-suggest --optimize-autoloader --classmap-authoritative
 
-RUN echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
-
-RUN apt update && apt -y install wget lsb-release apt-transport-https ca-certificates && \
-    wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
-    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list && \
-    apt update
-
-RUN apt install -q -y nano \
-    curl \
-    iputils-ping \
-    zlibc \
-    zlib1g \
-    zlib1g-dev \
-    zip \
-    unzip \
-    build-essential \
-    libpcre3 \
-    libpcre3-dev \
-    openssl \
-    uuid-dev \
-    libssl-dev \
-    libperl-dev \
-    procps \
-    mc \
-    cron \
-    supervisor \
-    apache2 \
-    apache2-utils \
-    apache2-dev \
-    libexpat1
-    
-RUN apt install -q -y \
-    php7.4 \
-    php7.4-bcmath \
-    php7.4-bz2 \
-    php7.4-common \
-    php7.4-xmlrpc \
-    php7.4-imagick \
-    php7.4-cli \
-    php7.4-imap \
-    php7.4-opcache \
-    php7.4-intl \
-    php7.4-soap \
-    php7.4-json \
-    php7.4-dev \
-    php7.4-zip \
-    php7.4-curl \
-    php7.4-gd \
-    php7.4-mysql \
-    php7.4-xml \
-    php7.4-mbstring \
-    php7.4-tidy \
-    php7.4-ssh2 \
-    php7.4-xdebug \
-    libapache2-mod-php7.4 \
-    php-pear \
-    graphicsmagick \
-    imagemagick \
-    php-redis
-
-RUN pecl install xdebug && echo 'zend_extension="/usr/lib/php/20190902/xdebug.so"' > /etc/php/7.4/mods-available/xdebug.ini
-
-RUN sed -i "s/memory_limit\s*=\s*.*/memory_limit = 1024M/g" ${php_conf} \
-    && sed -i "s/upload_max_filesize\s*=\s*2M/upload_max_filesize = 100M/g" ${php_conf} \
-    && sed -i "s/post_max_size\s*=\s*8M/post_max_size = 100M/g" ${php_conf} \
-    && sed -i "s/max_execution_time\s*=\s*60/max_execution_time = 3600/g" ${php_conf} \
-    && sed -i "s/variables_order = \"GPCS\"/variables_order = \"EGPCS\"/g" ${php_conf} \
-    && sed -i "s/;daemonize\s*=\s*yes/daemonize = no/g" ${php_conf}
-
-RUN a2enmod proxy && \
-    a2enmod ssl && \
-    a2enmod proxy_http && \
-    a2enmod proxy_ajp && \
-    a2enmod rewrite && \
-    a2enmod deflate && \
-    a2enmod headers && \
-    a2enmod proxy_balancer && \
-    a2enmod proxy_connect && \
-    a2enmod proxy_html && \
-    a2enmod http2 && \
-    a2enmod filter && \
-    a2enmod speling && \
-    a2enmod substitute && \
-    a2enmod expires
-
-RUN apt autoremove -y && apt clean && rm -rf /tmp/* && \
-    rm -Rf /var/www/* && \
-    rm -Rf /etc/apache2/sites-available/default-ssl.conf && \
-    mkdir -p /var/log/supervisor && \
-    mkdir -p /usr/bin && \
-    mkdir -p /var/www/html && \
-    mkdir -p /bin/autostart && \
-    chown www-data:www-data -R /var/www* && \
-    touch /var/log/cron.log && \
-    touch /var/www/html/heartbeat.html
-
-ADD config/supervisord.conf /etc/supervisor/conf.d/default.conf
-ADD config/apache.conf /etc/apache2/apache2.conf
-
-RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-RUN chmod +x wp-cli.phar && mv wp-cli.phar /usr/bin/wp
-
-WORKDIR /var/www/html
-
-EXPOSE 443 80
-CMD ["/bin/sh", "-c", "/usr/bin/supervisord -n"]
+CMD ["php-fpm"]
