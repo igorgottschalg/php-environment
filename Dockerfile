@@ -62,4 +62,4 @@ RUN \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     composer global require "hirak/prestissimo:dev-master" --no-suggest --optimize-autoloader --classmap-authoritative
 
-CMD ["supervisord", "-c", "/etc/supervisor.conf"]
+CMD ["supervisord", "-c", "/etc/supervisor/conf.d/default.conf"]
