@@ -1,14 +1,11 @@
 FROM php:7.3-fpm
 
-
 ENV PHP_OPCACHE_VALIDATE_TIMESTAMPS="0" \
     PHP_OPCACHE_MAX_ACCELERATED_FILES="10000" \
     PHP_OPCACHE_MEMORY_CONSUMPTION="192" \
     PHP_OPCACHE_MAX_WASTED_PERCENTAGE="10"
 
-
-RUN apt-get update \
-  && apt-get install -y \
+RUN apt-get update && apt-get install -y \
     libfreetype6-dev \ 
     libicu-dev \ 
     libjpeg62-turbo-dev \ 
@@ -23,8 +20,7 @@ RUN apt-get update \
     supervisor \
     nginx
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/
 RUN docker-php-ext-install \
   dom \ 
   gd \ 
