@@ -116,12 +116,6 @@ ADD ./configs/supervisord.conf /etc/supervisor/conf.d/default.conf
 ADD ./configs/nginx.conf /etc/nginx/nginx.conf
 ADD ./configs/opcache.ini /usr/local/etc/php.d/opcache.ini
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
-RUN \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
-    composer global require "hirak/prestissimo:dev-master" --no-suggest --optimize-autoloader --classmap-authoritative
-
-
 VOLUME /var/www
 WORKDIR /var/www/html
 
