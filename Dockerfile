@@ -122,7 +122,6 @@ RUN \
     composer global require "hirak/prestissimo:dev-master" --no-suggest --optimize-autoloader --classmap-authoritative
 
 
-USER app:app
 VOLUME /var/www
 WORKDIR /var/www/html
 
